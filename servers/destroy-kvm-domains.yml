@@ -1,0 +1,85 @@
+---
+# Creating tap interfaces nad bridges 
+#
+
+    - name: List qemu containers
+      shell: "docker ps --format {{ '{{' }}.Names{{ '}}' }} | grep qemu | cat"
+      register: qemu_containers
+      changed_when: False
+
+    - name: Check qemu_containers
+      debug:
+        msg: "qemu containers: {{ qemu_containers.stdout }}"
+
+    - name: Stop qemu containers
+      command: docker stop qemu-{{ item.name }}
+      with_items: "{{ k8s_inst }}"
+      when: "'qemu' in qemu_containers.stdout"
+
+#    - name: Stop  veth1 interfaces 
+#      command: ip link set {{ item.name }}-veth1 down
+#      with_items: "{{ k8s_inst }}"
+#      when: "'qemu' in qemu_containers.stdout"
+
+#    - name: Destroy veth1 interfaces 
+#      command: ip link delete {{ item.name }}-veth1
+#      with_items: "{{ k8s_inst }}"
+#      when: "'qemu' in qemu_containers.stdout"
+
+    - name: DELETE qcow2 file to image folder for k8s instances
+      file:
+        path: "{{ kvm_images_location }}/{{ item.name }}.qcow2"
+        state: absent
+      with_items: "{{ k8s_inst }}"
+
+    - name: DELETE guestfish-files.sh script files k8s instances
+      file:
+        path: "/tmp/guestfish-files-{{ item.name }}.sh"
+        state: absent
+      with_items: "{{ k8s_inst }}"
+
+    - name: DELETE mgmt.nmconnection files for k8s instances
+      file:
+        path: "/tmp/mgmt.nmconnection.{{ item.name }}"
+        state: absent
+      with_items: "{{ k8s_inst }}"
+
+    - name: DELETE srv.nmconnection files for k8s instances
+      file:
+        path: "/tmp/srv.nmconnection.{{ item.name }}"
+        state: absent
+      with_items: "{{ k8s_inst }}"
+
+    - name: DELETE hosts files for k8s instances
+      file:
+        path: "/tmp/hosts.{{ item.name }}"
+        state: absent
+      with_items: "{{ k8s_inst }}"
+
+    - name: DELETE hostname files for k8s instances
+      file:
+        path: "/tmp/hostname.{{ item.name }}"
+        state: absent
+      with_items: "{{ k8s_inst }}"
+
+    - name: DELETE multiple files and authorized_keys files
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - '/tmp/authorized_keys'
+        - '/tmp/dnf.conf'
+        - '/tmp/http-proxy.conf'
+        - '/tmp/bash_profile'
+        - '/tmp/kube-f34-prep1.sh'
+        - '/tmp/kube-f34-prep2.sh'
+        - '/tmp/calico.yaml'
+        - '/tmp/flannel.yaml'
+        - '/tmp/metallb-install-namespace.yaml'
+        - '/tmp/metallb-install.yaml'
+        - '/tmp/metallb-config.yaml'
+        - '/tmp/hello-app-lb-svc.yaml'
+        - '/tmp/hello-node-deploy.yaml' 
+
+
+

@@ -1,0 +1,25 @@
+---
+# Create containerized qemu instances for FSS
+# Author: Mau
+# check more in https://github.com/cloud-native-everything/srlinux-ansible-lab
+# June 2021
+#
+#
+- hosts: baremetals
+  gather_facts: no
+  remote_user: root
+
+
+  pre_tasks:
+    - include_vars: "/srl-lab/cfg/{{ cfg_option }}/fss_global.yml"
+
+  tasks:
+
+    - name: Store bridge in mgmt_bridge var
+      set_fact:
+        mgmt_bridge: "fss-bridge"
+
+
+    - include: /srl-lab/servers/fss-kvm-domains.yml
+    - include: /srl-lab/servers/fss-veth-tcmirred-settings.yml
+

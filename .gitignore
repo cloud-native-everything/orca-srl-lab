@@ -1,0 +1,14 @@
+# ignore all license.key
+**license.key
+# ignore all certificates 
+**leaf*.pem
+**leaf*.csr
+**leaf*.crt
+**rootCA.srl
+**CAKey.pem
+**/ca
+## remove trash
+**test*
+**output*
+## Ignore backups
+**bak*

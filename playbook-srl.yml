@@ -1,0 +1,63 @@
+---
+# Add ethernet-1/10 to leaf
+# author: Mau
+# check more in https://github.com/cloud-native-everything/srlinux-ansible-lab
+# June 2021
+#
+#
+- hosts: baremetals
+  gather_facts: no
+  remote_user: root
+
+  pre_tasks:
+    - include_vars: "/srl-lab/cfg/{{ cfg_option }}/global_vars.yml"
+
+  tasks:
+
+    - name: get list of srl leaf instances
+      shell: "ip netns | grep leaf | awk '{print $1}'"
+      register: leaf_inst
+      changed_when: False
+
+    - name: DEBUG
+      debug:
+        msg: "item: {{ item }}"
+      with_items: '{{ leaf_inst.stdout_lines }}'
+
+    - name: Copying certs files
+      copy:
+        src: "/srl-lab/certs/certs/{{ item }}"
+        dest: "/tmp/{{ item }}"
+        force: no
+        backup: no
+      with_items: 
+        - 'client.crt'
+        - 'client_key.pem'
+        - 'rootCA.crt' 
+
+    - name: Copying templates for mac-vrf1-add-interface JSON files
+      template:
+        src: mac-vrf1-add-interface.json.j2
+        dest: '/tmp/mac-vrf1-add-interface-{{ item.name }}.json'
+        mode: 0666
+      with_items: "{{ k8s_inst }}"
+
+    - name: Copying templates ethernet for JSON files
+      template:
+        src: ethernet.json.j2
+        dest: '/tmp/ethernet-{{ item.name }}.json'
+        mode: 0666
+      with_items: "{{ k8s_inst }}"
+
+    - name: add interface ethernet-1/1x to leaf
+      command: 
+        cmd: gnmic set --tls-ca rootCA.crt --tls-cert client.crt --tls-key client_key.pem -a {{ item.leaf }}:57400 --username admin --password admin -e json_ietf --skip-verify --update-path /interface\[name\={{ item.leaf_if }}\] --update-file ethernet-{{ item.name }}.json
+        chdir: '/tmp'
+      with_items: "{{ k8s_inst }}"
+
+    - name: add interface ethernet-1/10 to mac-vrf1
+      command: 
+        cmd: gnmic set --tls-ca rootCA.crt --tls-cert client.crt --tls-key client_key.pem -a {{ item.leaf }}:57400 --username admin --password admin -e json_ietf --skip-verify --update-path /network-instance\[name\=mac-vrf1\] --update-file mac-vrf1-add-interface-{{ item.name }}.json
+        chdir: '/tmp'
+      with_items: "{{ k8s_inst }}"
+
