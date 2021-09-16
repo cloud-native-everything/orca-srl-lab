@@ -44,9 +44,15 @@
         state: absent
       with_items: "{{ k8s_inst }}"
 
-    - name: DELETE srv.nmconnection files for k8s instances
+    - name: DELETE srv1.nmconnection files for k8s instances
       file:
-        path: "/tmp/srv.nmconnection.{{ item.name }}"
+        path: "/tmp/srv1.nmconnection.{{ item.name }}"
+        state: absent
+      with_items: "{{ k8s_inst }}"
+
+    - name: DELETE srv2.nmconnection files for k8s instances
+      file:
+        path: "/tmp/srv2.nmconnection.{{ item.name }}"
         state: absent
       with_items: "{{ k8s_inst }}"
 

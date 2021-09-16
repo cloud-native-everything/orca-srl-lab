@@ -6,62 +6,68 @@ metadata:
 data:
   config: |
     peers:
-    - peer-address: 1.1.1.11
-      peer-asn: 64999
+    - peer-address: 6.5.3.1
+      peer-asn: 65310
       my-asn: 65201
-      router-id: 1.1.1.20
+      router-id: 6.4.5.20
+      source-address: 6.4.5.20
       node-selectors:
       - match-expressions:
         - key: kubernetes.io/hostname
           operator: In
-          values: [wk-b1]
-    - peer-address: 1.1.1.12
-      peer-asn: 64999
+          values: [wk-a1]
+    - peer-address: 6.5.3.2
+      peer-asn: 65320
       my-asn: 65201
-      router-id: 1.1.1.21
+      router-id: 6.4.5.21
+      source-address: 6.4.5.21
       node-selectors:
       - match-expressions:
         - key: kubernetes.io/hostname
           operator: In
-          values: [wk-b2]
-    - peer-address: 1.1.1.11
-      peer-asn: 64999
+          values: [wk-a2]
+    - peer-address: 6.5.3.1
+      peer-asn: 65310
       my-asn: 65201
-      router-id: 1.1.1.22
+      router-id: 6.4.5.22
+      source-address: 6.4.5.22
       node-selectors:
       - match-expressions:
         - key: kubernetes.io/hostname
           operator: In
-          values: [wk-b3]
-    - peer-address: 1.1.1.12
-      peer-asn: 64999
+          values: [wk-a3]
+    - peer-address: 6.5.3.2
+      peer-asn: 65320
       my-asn: 65201
-      router-id: 1.1.1.30
+      router-id: 6.4.5.30
+      source-address: 6.4.5.30
       node-selectors:
       - match-expressions:
         - key: kubernetes.io/hostname
           operator: In
-          values: [ctl-b1]
-    - peer-address: 1.1.1.11
-      peer-asn: 64999
+          values: [ctl-a1]
+    - peer-address: 6.5.3.1
+      peer-asn: 65310
       my-asn: 65201
-      router-id: 1.1.1.31
+      router-id: 6.4.5.31
+      source-address: 6.4.5.31
       node-selectors:
       - match-expressions:
         - key: kubernetes.io/hostname
           operator: In
-          values: [ctl-b2]
-    - peer-address: 1.1.1.12
-      peer-asn: 64999
+          values: [ctl-a2]
+    - peer-address: 6.5.3.2
+      peer-asn: 65320
       my-asn: 65201
-      router-id: 1.1.1.32
+      router-id: 6.4.5.32
+      source-address: 6.4.5.32
       node-selectors:
       - match-expressions:
         - key: kubernetes.io/hostname
           operator: In
-          values: [ctl-b3]
+          values: [ctl-a3]
     address-pools:
     - name: default
       protocol: bgp
       addresses:
-      - 192.168.153.0/24
+      - 10.254.254.240/28

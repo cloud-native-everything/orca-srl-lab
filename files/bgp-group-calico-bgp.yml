@@ -1,0 +1,13 @@
+apiVersion: srlinux.fsc.nokia.com/v1alpha1
+kind: Networkinstance
+metadata:
+  name: ip-vrf1
+spec:
+  properties:
+    name: ip-vrf1
+    protocols:
+      bgp:
+        group:
+        - group-name: calico-bgp
+          description: "Just a test"
+  switchID: 172.20.20.5

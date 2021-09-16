@@ -1,0 +1,22 @@
+[connection]
+id=srv2
+uuid=76921c82-3826-449d-857b-c9618f3d9da8
+type=vlan
+interface-name=VLAN-20
+
+[vlan]
+interface-name=VLAN-20
+parent=eth1
+id=20
+
+[ipv4]
+address1={{ item.eth1_ip2 }}/{{ item.eth1_prefix2 }}
+dns-search=
+method=manual
+
+[ipv6]
+addr-gen-mode=stable-privacy
+dns-search=
+method=auto
+
+

@@ -11,7 +11,7 @@
 
 
   pre_tasks:
-    - include_vars: "/srl-lab/cfg/{{ cfg_option }}/global_vars.yml" 
+    - include_vars: "/orca-srl-lab/cfg/{{ cfg_option }}/global_vars.yml" 
 
   tasks:
 
@@ -34,7 +34,7 @@
         msg: "bridge is: {{ mgmt_bridge }}"
 
 
-    - include: /srl-lab/servers/destroy-infra-services.yml
-    - include: /srl-lab/servers/destroy-kvm-domains.yml 
-    - include: /srl-lab/servers/destroy-veth-tcmirred-settings.yml
-    - include: /srl-lab/destroy-srl.yml
+    - include: /orca-srl-lab/servers/destroy-infra-services.yml
+    - include: /orca-srl-lab/servers/destroy-kvm-domains.yml 
+    - include: /orca-srl-lab/servers/destroy-veth-tcmirred-settings.yml
+    - include: /orca-srl-lab/destroy-srl.yml

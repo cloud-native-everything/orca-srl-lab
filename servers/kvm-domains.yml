@@ -79,11 +79,20 @@
       when:
         - 'item.name not in st.stdout' 
 
-    - name: Copying srv.nmconnection template
+    - name: Copying srv1.nmconnection template
       template: 
-        src: srv.nmconnection.j2 
+        src: srv1.nmconnection.j2 
         backup: no 
-        dest: "/tmp/srv.nmconnection.{{ item.name }}"
+        dest: "/tmp/srv1.nmconnection.{{ item.name }}"
+      with_items: "{{ k8s_inst }}"
+      when:
+        - 'item.name not in st.stdout' 
+
+    - name: Copying srv2.nmconnection template
+      template: 
+        src: srv2.nmconnection.j2 
+        backup: no 
+        dest: "/tmp/srv2.nmconnection.{{ item.name }}"
       with_items: "{{ k8s_inst }}"
       when:
         - 'item.name not in st.stdout' 

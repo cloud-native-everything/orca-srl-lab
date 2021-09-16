@@ -10,7 +10,7 @@
   remote_user: root
 
   pre_tasks:
-    - include_vars: "/srl-lab/cfg/{{ cfg_option }}/global_vars.yml"
+    - include_vars: "/orca-srl-lab/cfg/{{ cfg_option }}/global_vars.yml"
 
   tasks:
 
@@ -26,7 +26,7 @@
 
     - name: Copying certs files
       copy:
-        src: "/srl-lab/certs/certs/{{ item }}"
+        src: "/orca-srl-lab/certs/certs/{{ item }}"
         dest: "/tmp/{{ item }}"
         force: no
         backup: no
