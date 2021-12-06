@@ -29,6 +29,9 @@ Before reboot (fedora34):
 systemctl disable --now firewalld
 systemctl disable --now systemd-resolved
 
+## add nameserver to baremetal (use your local dns ip server)
+sudo sed -i 's/^nameserver=.*$/nameserver=8.8.8.8/' /etc/resolv.conf
+
 ## disable selinux
 sudo setenforce 0
 sudo sed -i 's/^SELINUX=.*$/SELINUX=disabled/' /etc/selinux/config
@@ -55,13 +58,13 @@ bash -c "$(curl -sL https://get-clab.srlinux.dev)" -- -v 0.16.1
 mkdir clab-quickstart
 cd ~/clab-quickstart
 
-## copy license.key (you should contact someone from Nokia to get it)
+## copy license.key (You don't need this file anymore, just remove it form your topology file)
 
 ## guestfish tools
 dnf -y install bridge-utils
 dnf -y install libguestfs libguestfs-tools qemu-kvm libvirt
-system start libvirtd
-system enable --now  libvirtd
+systemctl start libvirtd
+systemctl enable --now  libvirtd
 
 mkdir -p /home/qemu
 chown -R qemu:qemu /home/qemu
@@ -77,6 +80,10 @@ cd
 git clone https://github.com/cloud-native-everything/srlinux-ansible-lab
 cd ~/srlinux-ansible-lab
 sudo docker build -t srl-lab:0.1 .
+
+## Instal ssh keys in your baremetal if you dont have them
+ssh-keygen -t rsa
+
 ```
 
 # Install
@@ -85,7 +92,7 @@ Assuming you are cloning this repo in your home folder: ``` ~/srlinux-ansible-la
 
 ```
 sudo docker build -t srl-lab:0.1 .
-sudo docker run -d -t -i --name srl-ansible -v ~/srlinux-ansible-lab:/srl-lab srl-ansible:0.1
+sudo docker run -d -t -i --name srl-ansible -v ~/srlinux-ansible-lab:/srl-lab srl-lab:0.1
 sudo docker exec -ti srl-ansible bash
 ```
 
@@ -95,7 +102,7 @@ As soon as you are inside te container, you have to create your own ssh keys and
 cd
 ssh-keygen -t rsa
 cp /root/.ssh/* .ssh/. 
-ssh-copy-id root@10.99.99.1
+ssh-copy-id root@10.99.99.15
 ```
 
 Don't forget to modify the hosts inventory file (i.e. servers/hosts )
@@ -178,6 +185,13 @@ This is only informative
 # Running playbook
 
 Now it's time to run the playbook and connect QEMU instances to the SRL device.
+
+Remember to change your inventory file 'servers/hosts'
+
+```
+[baremetals]
+10.99.99.15
+```
 I added a folder inside cfg to manage different configurations in case is required. You just need to point it with cfg_option
 
 ```
@@ -197,5 +211,6 @@ ansible-playbook -e cfg_option=srl02-evpn -i servers/hosts playbook-srl.yml
 ```
 ansible-playbook  -e cfg_option=srl01 -i servers/hosts destroy.yml
 ```
+
 
 
