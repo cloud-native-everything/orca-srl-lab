@@ -1,0 +1,75 @@
+"""
+@name k8s_l3evpn
+@version 0.0.1
+Helm chart to create overlay layer3 evepn network for k8s, ready to support calico, multus and metallb
+author: Mauricio Rojas (Mau)
+"""
+
+version srlinux_k8s: "v1alpha2"
+note: set property switchID to ?switchid
+
+## Definition
+define type vlan as integer with 0 <= value <= 4094
+
+## Input
+input switchid as string default "172.20.20.5"
+input irb_itf as {name as string, cidr as IPv4_CIDR, vlan as vlan}
+    default {name: "irb10", cidr: "192.168.199.1/24", vlan: 1000 }
+input access_interface as {name as string, vlans as [vlan]}
+    default {name: "ethernet-1/20", vlans:[1010, 1020, 1030]}
+input macvrf_name as string default "k8s-macvrf"
+input ipvrf_name as string default "k8s-ipvrf"
+
+## Create
+create Interface irb_itf where
+    name = ?irb_itf.name
+
+create Subinterface irb_subitf in irb_itf where
+    index = ?irb_itf.vlan
+    admin-state = "enable"
+    ipv4 = {
+            address = [ { ip-prefix: ?irb_itf.cidr } ]
+        }
+
+create Networkinstance demo4ipvrf where
+    name = ?ipvrf_name
+    type = "ip-vrf"
+    admin-state = "enable"
+    description = "demo4ipvrf"
+
+create Networkinstance demo4macvrf where
+    name = ?macvrf_name
+    type = "mac-vrf"
+    admin-state = "enable"
+    description = "demo4macvrf"
+
+constant irb_vlan = ?irb_itf.vlan
+create Interface ni_irb_itf_macvrf in demo4macvrf where
+    name = ?irb_itf.name + "." + {toString(irb_vlan)}
+    which DependsOn irb_subitf
+
+create Interface ni_irb_itf_ipvrf in demo4ipvrf where
+    name = ?irb_itf.name + "." + {toString(irb_vlan)}
+    which DependsOn irb_subitf
+
+find Interface access_itf where
+    name = ?access_interface.name
+
+block for vlan in ?access_interface.vlans
+    create Subinterface access_subitf_{vlan} in access_itf where
+        index = {vlan}
+        type = "bridged"
+        vlan = {
+            encap = {
+                single-tagged = {
+                    vlan-id = {toString(vlan)}
+                }
+            }
+        }
+
+    create Interface ni_access_itf_macvrf_{vlan} in demo4macvrf where
+        name = ?access_interface.name + "." + {vlan}
+        which DependsOn access_subitf_{vlan}
+endblock
+
+
