@@ -1,4 +1,4 @@
-# location of files
+# location of files and other settings
 ntp_server: '10.5.0.50'
 k8s_qcow2_image: "/home/qemu/f34-password-kubeadm.qcow2"
 kvm_images_location: "/home/qemu"
